@@ -77,7 +77,7 @@ That’s why Universalis-bulk-checker is invented. You provide a list of materia
 
 8. Extend your business!
 
-   What if you are tired of crafting Moqueca and want to try Gemdraught of DEX G2? Or if your datacenter isn’t populated with raiders so you want to craft housing items instead?
+   What if you are tired of crafting Moqueca and want to try other [meals](https://ffxiv.consolegameswiki.com/wiki/Meals) and [potions](https://ffxiv.consolegameswiki.com/wiki/Medicines)? Or if your datacenter isn’t populated with raiders so you want to craft housing items instead?
 
    Use your imagination and wish you fortune and luck!
 
