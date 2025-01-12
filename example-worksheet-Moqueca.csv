@@ -50,7 +50,7 @@ Synthesis Plan,,,,,Yield / Craft,Time / Craft,Expense / Hour,Revenue / Hour,Prof
 #11 ココナッツミルク[HQ] + トラルコーンオイル[HQ] → ムケッカ[HQ],,,,,3,37.5,=($D$4*3+$D$5*3+$D$13+$D$14+$D$17+$D$18+$D$20+$D$22*2)*3600/$G50*1.05,=$D$30*$F50*3600/$G50*-0.97,=$I50-$H50
 ,,,,,,,,,
 (What if I craft the intermediate products),,,,,,,,,
-Compond Synthesis Plan,,,,,Yield / Batch,Time / Batch,Expense / Hour,Revenue / Hour,Profit / Hour
+Compound Synthesis Plan,,,,,Yield / Batch,Time / Batch,Expense / Hour,Revenue / Hour,Profit / Hour
 #2 + #8(×3),,,,,9,=G$41+G$47*3,=(($D$3*8+$D$15*6)+($D$4*3+$D$5*3+$D$13+$D$14+$D$17+$D$18+$D$21*2+$D$7*$G$47/1800)*3)*3600/$G54*1.05,=$D$30*$F54*3600/$G54*-0.97,=$I54-$H54
 #2 + #11(×3),,,,,9,=G$41+G$50*3,=(($D$3*8+$D$15*6)+($D$4*3+$D$5*3+$D$13+$D$14+$D$17+$D$18+$D$22*2)*3)*3600/$G55*1.05,=$D$30*$F55*3600/$G55*-0.97,=$I55-$H55
 #4(×2) + #9(×3),,,,,9,=G$43*2+G$48*3,=(($D$3*8+$D$16*6)*2+($D$4*3+$D$5*3+$D$13+$D$14+$D$17+$D$18+$D$19+$D$7*$G$48/1800)*3)*3600/$G56*1.05,=$D$30*$F56*3600/$G56*-0.97,=$I56-$H56
