@@ -21,6 +21,8 @@ class Item:
         self.result_available = False
         self.actual_quantity: int | None = None
         self.price_each: float | None = None
+        self.min_price_each: int | None = None
+        self.max_purchase_price_each: int | None = None
         self.sells_per_day: float | None = None
 
     @property
@@ -82,24 +84,24 @@ class RequestQueue:
                                 count += 1
                     case RequestType.BuyNQ:
                         if len(item_ids_group) == 1:
-                            listing = client.get(f'https://universalis.app/api/v2/{market}/{item_ids_joined}?fields=listings.quantity,listings.total,listings.tax,nqSaleVelocity').raise_for_status().json()
+                            listing = client.get(f'https://universalis.app/api/v2/{market}/{item_ids_joined}?fields=listings.pricePerUnit,listings.quantity,listings.total,listings.tax,nqSaleVelocity').raise_for_status().json()
                             for item in item_handles[item_ids_group[0]]:
                                 self._write_buying_price(item, listing)
                                 count += 1
                         else:
-                            listings = client.get(f'https://universalis.app/api/v2/{market}/{item_ids_joined}?fields=items.listings.quantity,items.listings.total,items.listings.tax,items.nqSaleVelocity').raise_for_status().json()
+                            listings = client.get(f'https://universalis.app/api/v2/{market}/{item_ids_joined}?fields=items.listings.pricePerUnit,items.listings.quantity,items.listings.total,items.listings.tax,items.nqSaleVelocity').raise_for_status().json()
                             for item_id, listing in listings['items'].items():
                                 for item in item_handles[int(item_id)]:
                                     self._write_buying_price(item, listing)
                                     count += 1
                     case RequestType.BuyHQ:
                         if len(item_ids_group) == 1:
-                            listing = client.get(f'https://universalis.app/api/v2/{market}/{item_ids_joined}?hq=1&fields=listings.quantity,listings.total,listings.tax,hqSaleVelocity').raise_for_status().json()
+                            listing = client.get(f'https://universalis.app/api/v2/{market}/{item_ids_joined}?hq=1&fields=listings.pricePerUnit,listings.quantity,listings.total,listings.tax,hqSaleVelocity').raise_for_status().json()
                             for item in item_handles[item_ids_group[0]]:
                                 self._write_buying_price(item, listing)
                                 count += 1
                         else:
-                            listings = client.get(f'https://universalis.app/api/v2/{market}/{item_ids_joined}?hq=1&fields=items.listings.quantity,items.listings.total,items.listings.tax,items.hqSaleVelocity').raise_for_status().json()
+                            listings = client.get(f'https://universalis.app/api/v2/{market}/{item_ids_joined}?hq=1&fields=items.listings.pricePerUnit,items.listings.quantity,items.listings.total,items.listings.tax,items.hqSaleVelocity').raise_for_status().json()
                             for item_id, listing in listings['items'].items():
                                 for item in item_handles[int(item_id)]:
                                     self._write_buying_price(item, listing)
@@ -117,6 +119,8 @@ class RequestQueue:
                 break
             actual_quantity += i['quantity']
             total_price += i['total'] + i['tax']
+            item.min_price_each = i['pricePerUnit'] if item.min_price_each is None else min(item.min_price_each, i['pricePerUnit'])
+            item.max_purchase_price_each = i['pricePerUnit'] if item.max_purchase_price_each is None else max(item.max_purchase_price_each, i['pricePerUnit'])
         if actual_quantity != 0:
             item.actual_quantity = actual_quantity
             item.price_each = (total_price * 20) / (actual_quantity * 21)  # Remove 5% tax
@@ -128,6 +132,7 @@ class RequestQueue:
         quality = 'hq' if item.hq else 'nq'
         try:
             item.price_each = -typing.cast(dict[str, dict[str, dict[str, dict[str, int]]]], price)[quality]['minListing'][self.market_types[item.market]]['price']
+            item.min_price_each = item.price_each
         except KeyError:
             pass
         try:
@@ -195,9 +200,18 @@ def main(argv: list[str]) -> int:
     if not sys.stdout.isatty:
         sys.stdout.write('\ufeff')
     csv_writer = csv.writer(sys.stdout)
-    csv_writer.writerow(['Item', 'Want Quantity', 'Market', 'Price Each (w/o tax)', 'Actual Quantity', 'Sells per Day', 'Universalis URL'])
+    csv_writer.writerow(['Item', 'Want Quantity', 'Market', 'Price Each (w/o tax)', 'Min Price Each', 'Max Purchase Price Each', 'Actual Quantity', 'Sells per Day', 'Universalis URL'])
     for item in items:
-        csv_writer.writerow([item.name_with_hq, item.want_quantity, item.market, '' if item.price_each is None else f'{item.price_each:.2f}', '' if item.actual_quantity is None else item.actual_quantity, '' if item.sells_per_day is None else f'{item.sells_per_day:.2f}', item.universalis_url])
+        csv_writer.writerow([
+            item.name_with_hq,
+            item.want_quantity,
+            item.market,
+            '' if item.price_each is None else f'{item.price_each:.2f}',
+            '' if item.min_price_each is None else str(item.min_price_each),
+            '' if item.max_purchase_price_each is None else str(item.max_purchase_price_each),
+            '' if item.actual_quantity is None else item.actual_quantity,
+            '' if item.sells_per_day is None else f'{item.sells_per_day:.2f}',
+        item.universalis_url])
     return 0
 
 
